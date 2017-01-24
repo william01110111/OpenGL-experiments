@@ -12,7 +12,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "ShaderProgram.h"
-
+#include <math.h>
 
 // Function prototypes
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -20,66 +20,33 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Window dimensions
 const GLuint WIDTH = 800, HEIGHT = 600;
 
-const GLchar* fragmentShaderSource = "#version 330 core\n"
-    "out vec4 color;\n"
-    "void main()\n"
-    "{\n"
-    "color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
+GLuint VBO, VAO, EBO;
+GLFWwindow* window;
+int width, height;
 
-// The MAIN function, from here we start the application and run the game loop
-int main()
-{
-    std::cout << "Starting GLFW context, OpenGL 3.3" << std::endl;
-    // Init GLFW
-    glfwInit();
-    // Set all the required options for GLFW
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    // Create a GLFWwindow object that we can use for GLFW's functions
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
-    glfwMakeContextCurrent(window);
-
-    // Set the required callback functions
-    glfwSetKeyCallback(window, key_callback);
-
-    // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
-    glewExperimental = GL_TRUE;
-    // Initialize GLEW to setup the OpenGL Function pointers
-    glewInit();
-
-    // Define the viewport dimensions
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);  
-    glViewport(0, 0, width, height);
-
-    ShaderProgram shaderProgram("shader0.vert", "shader0.frag", true);
-    
-    // Set up vertex data (and buffer(s)) and attribute pointers
-    //GLfloat vertices[] = {
-    //  // First triangle
-    //   0.5f,  0.5f,  // Top Right
-    //   0.5f, -0.5f,  // Bottom Right
-    //  -0.5f,  0.5f,  // Top Left 
-    //  // Second triangle
-    //   0.5f, -0.5f,  // Bottom Right
-    //  -0.5f, -0.5f,  // Bottom Left
-    //  -0.5f,  0.5f   // Top Left
-    //}; 
-    GLfloat vertices[] = {
+    const GLfloat vertices[] =
+    {
          0.5f,  0.5f, 0.0f,  // Top Right
          0.5f, -0.5f, 0.0f,  // Bottom Right
         -0.5f, -0.5f, 0.0f,  // Bottom Left
         -0.5f,  0.5f, 0.0f   // Top Left 
     };
-    GLuint indices[] = {  // Note that we start from 0!
+    const GLuint indices[] =
+    {  // Note that we start from 0!
         0, 1, 3,  // First Triangle
         1, 2, 3   // Second Triangle
     };
-    GLuint VBO, VAO, EBO;
+    
+ShaderProgram shaderProgram;
+    
+
+void func()
+{
+	
+	shaderProgram=ShaderProgram("shader0.vert", "shader0.frag", false);
+    
+    
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
@@ -98,12 +65,12 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
     glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-
-
+    
     // Uncommenting this call will result in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    // Game loop
+	
+	// Game loop
     while (!glfwWindowShouldClose(window))
     {
         // Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
@@ -124,12 +91,69 @@ int main()
         // Swap the screen buffers
         glfwSwapBuffers(window);
     }
+    
     // Properly de-allocate all resources once they've outlived their purpose
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
     // Terminate GLFW, clearing any resources allocated by GLFW.
     glfwTerminate();
+    
+    //cout << jhgjkhkj << endl;
+}
+
+// The MAIN function, from here we start the application and run the game loop
+int main()
+{
+	//long a=0, b=0, c=0, d=0;
+	
+    std::cout << "Starting GLFW context, OpenGL 3.3" << std::endl;
+    // Init GLFW
+    glfwInit();
+    // Set all the required options for GLFW
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    
+    // Create a GLFWwindow object that we can use for GLFW's functions
+    window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr);
+    glfwMakeContextCurrent(window);
+
+    // Set the required callback functions
+    glfwSetKeyCallback(window, key_callback);
+
+    // Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
+    glewExperimental = GL_TRUE;
+    // Initialize GLEW to setup the OpenGL Function pointers
+    glewInit();
+	
+    // Define the viewport dimensions
+    
+    glfwGetFramebufferSize(window, &width, &height);  
+    glViewport(0, 0, width, height);
+    
+	//GLfloat timeValue = 7;
+	
+	//cout << timeValue << endl;
+	//GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+	//glUseProgram(shaderProgram);
+	//glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+    
+    // Set up vertex data (and buffer(s)) and attribute pointers
+    //GLfloat vertices[] = {
+    //  // First triangle
+    //   0.5f,  0.5f,  // Top Right
+    //   0.5f, -0.5f,  // Bottom Right
+    //  -0.5f,  0.5f,  // Top Left 
+    //  // Second triangle
+    //   0.5f, -0.5f,  // Bottom Right
+    //  -0.5f, -0.5f,  // Bottom Left
+    //  -0.5f,  0.5f   // Top Left
+    //}; 
+    func();
+    
+    
     return 0;
 }
 

@@ -5,7 +5,7 @@ ShaderProgram::ShaderProgram(string vertFile, string fragFile, bool debug)
 	Shader vertShader(vertFile, GL_VERTEX_SHADER, debug);
 	Shader fragShader(fragFile, GL_FRAGMENT_SHADER, debug);
 	
-    GLuint data = glCreateProgram();
+    data = glCreateProgram();
     glAttachShader(data, vertShader);
     glAttachShader(data, fragShader);
     glLinkProgram(data);
@@ -27,7 +27,7 @@ string ShaderProgram::getInfoLog()
 
 ShaderProgram::~ShaderProgram()
 {
-	glDeleteProgram(data);
+	//glDeleteProgram(data);
 }
 
 ShaderProgram::Shader::Shader(string file, GLenum type, bool debug)
@@ -59,5 +59,5 @@ string ShaderProgram::Shader::getInfoLog()
 
 ShaderProgram::Shader::~Shader()
 {
-	glDeleteShader(data);
+	//glDeleteShader(data);
 }

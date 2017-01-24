@@ -9,6 +9,7 @@ class ShaderProgram
 {
 public:
 	
+	ShaderProgram() {data=0;};
 	ShaderProgram(string vertFile, string fragFile, bool debug);
 	inline operator GLuint() {return data;}
 	~ShaderProgram();

@@ -38,6 +38,8 @@
 		</Linker>
 		<Unit filename="ShaderProgram.cpp" />
 		<Unit filename="ShaderProgram.h" />
+		<Unit filename="Window.cpp" />
+		<Unit filename="Window.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="shader0.frag" />
 		<Unit filename="shader0.vert" />

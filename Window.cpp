@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -6,7 +8,14 @@
 #include "Window.h"
 //written using https://learnopengl.com/
 
+std::unordered_map<GLFWwindow*, Window*> windowMap;
+
 int Window::instanceCount=0;
+
+Window* getWindow(GLFWwindow* window)
+{
+	return windowMap[window];
+}
 
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -16,6 +25,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		if (key==GLFW_KEY_ESCAPE || key==GLFW_KEY_ENTER)
 		{
 			glfwSetWindowShouldClose(window, GL_TRUE);
+		}
+		
+		if (key==GLFW_KEY_PERIOD)
+		{
+			getWindow(window)->blurRds*=1.1;
+		}
+		
+		if (key==GLFW_KEY_COMMA)
+		{
+			getWindow(window)->blurRds*=0.9;
 		}
 	}
 }
@@ -54,6 +73,7 @@ void Window::open(int w, int h, string nameIn)
 	name=nameIn;
 	
 	windowObj = glfwCreateWindow(w, h, name.c_str(), nullptr, nullptr);
+	windowMap[windowObj]=this;
 	glfwMakeContextCurrent(windowObj);
 	
 	glfwSetKeyCallback(windowObj, key_callback);
@@ -72,6 +92,7 @@ void Window::close()
 {
 	if (windowObj)
 	{
+		windowMap.erase(windowObj);
 		glfwDestroyWindow(windowObj);
 		windowObj=nullptr;
 	}
@@ -185,6 +206,8 @@ bool Window::update()
 
 void Window::drawRect()
 {
+	cout << blurRds << endl;
+	
 	// Draw our first triangle
 	glUseProgram(shaderProgram);
 	glBindTexture(GL_TEXTURE_2D, texture);

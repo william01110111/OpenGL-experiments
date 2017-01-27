@@ -16,6 +16,8 @@ public:
 	bool update(); //returns true while the window is open
 	void drawRect();
 	
+	float blurRds=0.01;
+	
 private:
 	
 	void setupGL();

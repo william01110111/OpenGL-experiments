@@ -212,6 +212,8 @@ void Window::drawRect()
 	glUseProgram(shaderProgram);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(squareVAO);
+	blurRds*=1.1;
+	glUniform1f(1, blurRds);
 	
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

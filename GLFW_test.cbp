@@ -37,8 +37,6 @@
 			<Add option="-lGL" />
 			<Add option="-lSOIL" />
 		</Linker>
-		<Unit filename="Image.cpp" />
-		<Unit filename="Image.h" />
 		<Unit filename="ShaderProgram.cpp" />
 		<Unit filename="ShaderProgram.h" />
 		<Unit filename="Window.cpp" />

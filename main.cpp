@@ -14,7 +14,7 @@ int main()
 {
 	Window window;
 	
-	window.open(1200, 800, "hello window");
+	window.open(1200, 1200, "hello window");
 	
 	while (window.update())
 	{

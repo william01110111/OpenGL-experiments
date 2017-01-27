@@ -25,6 +25,7 @@ private:
 	string name;
 	ShaderProgram shaderProgram;
 	GLuint squareVAO;
+	GLuint texture;
 	
 	GLFWwindow * windowObj=nullptr;
 };

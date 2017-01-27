@@ -1,8 +1,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <SOIL/SOIL.h>
+
 #include "Window.h"
-#include "Image.h"
 //written using https://learnopengl.com/
 
 int Window::instanceCount=0;
@@ -10,8 +11,13 @@ int Window::instanceCount=0;
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (action==GLFW_PRESS)
+	{
+		if (key==GLFW_KEY_ESCAPE || key==GLFW_KEY_ENTER)
+		{
+			glfwSetWindowShouldClose(window, GL_TRUE);
+		}
+	}
 }
 
 Window::Window()
@@ -78,12 +84,12 @@ void Window::setupGL()
 	GLuint VBO, EBO;
 	int width, height;
 	
-	GLfloat vertices[] =
-	{
-		0.5f,  0.5f, 0.0f,  // Top Right
-		0.5f, -0.5f, 0.0f,  // Bottom Right
-		-0.5f, -0.5f, 0.0f,  // Bottom Left
-		-0.5f,  0.5f, 0.0f   // Top Left
+	GLfloat vertices[] = {
+		//Positions				Colors					Texture Coords
+		1.0f,	1.0f,	0.0f,	0.0f,	1.0f,	0.0f,	1.0f,	0.0f,	// Top Right
+		1.0f,	-1.0f,	0.0f,	0.0f,	0.5f,	0.5f,	1.0f,	1.0f,	// Bottom Right
+		-1.0f,	-1.0f,	0.0f,	0.0f,	0.0f,	1.0f,	0.0f,	1.0f,	// Bottom Left
+		-1.0f,	1.0f,	0.0f,	0.0f,	0.0f,	0.5f,	0.0f,	0.0f,	// Top Left 
 	};
 	
 	GLuint indices[] =
@@ -103,13 +109,22 @@ void Window::setupGL()
 	glBindVertexArray(squareVAO);
 		
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+			
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+			
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 			glEnableVertexAttribArray(0);
+			
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3*sizeof(GL_FLOAT)));
+			glEnableVertexAttribArray(1);
+			
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(6*sizeof(GL_FLOAT)));
+			glEnableVertexAttribArray(2);
+		
 		glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STREAM_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 		//remember: do NOT unbind the EBO, keep it bound to this VAO
 		
 	glBindVertexArray(false); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
@@ -123,11 +138,27 @@ void Window::setupGL()
 
 void Window::setupTexture()
 {
-	//GLuint texture;
-	//glGenTextures(1, &texture);
-	//glBindTexture(GL_TEXTURE_2D, texture);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-}
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	
+	// Set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	// Load and generate the texture
+	int width, height;
+    unsigned char* image = SOIL_load_image("/home/william/c++/GLFW_test/orange.jpg", &width, &height, 0, SOIL_LOAD_RGB);
+    if (!image)
+	{
+		cout << "image loading error: " << SOIL_last_result() << endl;
+	}
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    SOIL_free_image_data(image);
+    glBindTexture(GL_TEXTURE_2D, 0); // Unbind texture when done, so we won't accidentily mess up our texture.
+ }
 
 //refresh the window
 bool Window::update()
@@ -156,6 +187,7 @@ void Window::drawRect()
 {
 	// Draw our first triangle
 	glUseProgram(shaderProgram);
+	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(squareVAO);
 	
 	//glDrawArrays(GL_TRIANGLES, 0, 6);
